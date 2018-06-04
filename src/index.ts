@@ -5,21 +5,28 @@ const reduc = [0, 0.05, 0.1, 0.2, 0.25];
 
 export var pricePredict = (basket)=>{
     let totalPrice = 0;
-    let booksNumber = {};
+    let booksStack = {};
     basket.map(element  => {
-       booksNumber[element] =(booksNumber[element] ) ? booksNumber[element] + 1 :1;
+       booksStack[element] =(booksStack[element] ) ? booksStack[element] + 1 : 1;
     });
-    let booksKeys = 0;
-    for ( var key in booksNumber){
-        booksKeys ++;
-    }
-    if(booksKeys != 1){
-        totalPrice  = (bookPrice*booksKeys) - (bookPrice*booksKeys)*reduc[booksKeys - 1];
-        totalPrice = ( basket.length  - booksKeys )*bookPrice + totalPrice
-    }else{
-        totalPrice =  basket.length*bookPrice  
-    }
-  
-    return totalPrice;
+    let price = priced( booksStack , totalPrice, basket.length ,0);
+    return  price;
 }
 
+
+var priced = ( booksBasket , totalPrice , totalBooks ,totalbooksBasketPriced) =>{
+    let booksBasketPriced = 0;
+    for ( var key in booksBasket){
+        if(booksBasket[key] !== 0 ){
+            booksBasketPriced++;
+            booksBasket[key]  = booksBasket[key]-1;
+        } 
+    }
+    totalPrice = totalPrice + ( booksBasketPriced*bookPrice - booksBasketPriced*bookPrice*reduc[booksBasketPriced - 1]) 
+    totalbooksBasketPriced  = totalbooksBasketPriced+booksBasketPriced;
+    if(totalBooks === totalbooksBasketPriced ){
+        return totalPrice;
+    }else{
+        return priced(booksBasket , totalPrice, totalBooks ,totalbooksBasketPriced);
+    }
+}
